@@ -24,7 +24,7 @@ class QueryRunner:
 				dic_relevance_docs[arquiv] = set(arq.readline().split(","))
 		return dic_relevance_docs
 
-	def count_topn_relevant(self,n,respostas:List[int],doc_relevantes:Set[int]) -> int:
+	def count_topn_relevant(self,n:int,respostas:List[int],doc_relevantes:Set[int]) -> int:
 		"""
 		Calcula a quantidade de documentos relevantes na top n posições da lista lstResposta que é a resposta a uma consulta
 		Considere que respostas já é a lista de respostas ordenadas por um método de processamento de consulta (BM25, Modelo vetorial).
@@ -41,7 +41,8 @@ class QueryRunner:
 		precision = None
 		recall = None
 		return precision, recall
-	def get_query_term_occurence(self, query:str) -> Mapping[str,TermOccurrence]:
+    
+    def get_query_term_occurence(self, query:str) -> Mapping[str,TermOccurrence]:
 		"""
 			Preprocesse a consulta da mesma forma que foi preprocessado o texto do documento (use a classe Cleaner para isso).
 			E transforme a consulta em um dicionario em que a chave é o termo que ocorreu
