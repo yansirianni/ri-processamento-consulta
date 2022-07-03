@@ -39,16 +39,26 @@ class BooleanRankingModel(RankingModel):
     def __init__(self,operator:OPERATOR):
         self.operator = operator
 
-    def intersection_all(self,map_lst_occurrences:Mapping[str,List[TermOccurrence]]) -> List[int]:
-        set_ids = set()
-        return None
-    def union_all(self,map_lst_occurrences:Mapping[str,List[TermOccurrence]]) -> List[int]:
+    def intersection_all(self, map_lst_occurrences:Mapping[str,List[TermOccurrence]]) -> List[int]:
+        
+        set_lst = []
+
+        for  term, lst_occurrences in map_lst_occurrences.items():
+            set_ids = set()
+            for term_occurence in lst_occurrences:
+                set_ids.add(term_occurence.doc_id)
+            set_lst.append(set_ids)    
+                
+        return set.intersection(*set_lst) if set_lst else set()
+
+    def union_all(self, map_lst_occurrences:Mapping[str,List[TermOccurrence]]) -> List[int]:
         set_ids = set()
         
         for  term, lst_occurrences in map_lst_occurrences.items():
-            pass
+            for term_occurence in lst_occurrences:
+                set_ids.add(term_occurence.doc_id)
 
-        return None
+        return set_ids
 
     def get_ordered_docs(self,query:Mapping[str,TermOccurrence],
                               map_lst_occurrences:Mapping[str,List[TermOccurrence]]) -> (List[int], Mapping[int,float]):
