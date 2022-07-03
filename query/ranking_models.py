@@ -76,16 +76,16 @@ class VectorRankingModel(RankingModel):
 
     @staticmethod
     def tf(freq_term:int) -> float:
-        return 0
+        return 1 + math.log2(freq_term)
 
     @staticmethod
     def idf(doc_count:int, num_docs_with_term:int )->float:
-        return 0
+        return math.log2(doc_count/num_docs_with_term)
 
     @staticmethod
     def tf_idf(doc_count:int, freq_term:int, num_docs_with_term) -> float:
-        tf = 0
-        idf = 0
+        tf = VectorRankingModel.tf(freq_term)
+        idf = VectorRankingModel.idf(doc_count, num_docs_with_term)
         #print(f"TF:{tf} IDF:{idf} n_i: {num_docs_with_term} N: {doc_count}")
         return tf*idf
 
