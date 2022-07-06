@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 from typing import List
 from abc import abstractmethod
 from typing import List, Set,Mapping
@@ -107,11 +108,35 @@ class VectorRankingModel(RankingModel):
     def get_ordered_docs(self,query:Mapping[str,TermOccurrence],
                               docs_occur_per_term:Mapping[str,List[TermOccurrence]]) -> (List[int], Mapping[int,float]):
             documents_weight = {}
-
-
-
-
-
+            docs_with_term ={}
+            tf_idf_dict = dict()
+            dict_position = dict()
+           # for  term, TermOccurrence in query.items():
+            for  term, lst_occurrences in docs_occur_per_term.items():
+                docs_with_term[term] = len(lst_occurrences);
+                for occurrence in lst_occurrences: 
+                    if term in tf_idf_dict.keys():
+                        tf_idf_dict[term].append([VectorRankingModel.tf_idf(self.idx_pre_comp_vals.doc_count, occurrence.term_freq, docs_with_term[term]),occurrence.doc_id])
+                    else:
+                        tf_idf_dict[term] = []
+                        tf_idf_dict[term].append([VectorRankingModel.tf_idf(self.idx_pre_comp_vals.doc_count, occurrence.term_freq, docs_with_term[term]),occurrence.doc_id])
+                        
+            querryWeight = dict()
+            for  term, lst_occurrences in query.items():
+                if term in docs_with_term:
+                    querryWeight[term] =  [VectorRankingModel.tf_idf(self.idx_pre_comp_vals.doc_count, lst_occurrences.term_freq, docs_with_term[term])]
+                
+                
+            for key,values in tf_idf_dict.items():
+                for value in values:
+                    if value[1] in documents_weight:
+                        documents_weight[value[1]] = value[0]*querryWeight[key][0] +documents_weight[value[1]];
+                    else:
+                        documents_weight[value[1]] = value[0]*querryWeight[key][0]
+                        
+            for key,value in documents_weight.items():
+                documents_weight[key] /= self.idx_pre_comp_vals.document_norm[key];   
+                
             #retona a lista de doc ids ordenados de acordo com o TF IDF
             return self.rank_document_ids(documents_weight),documents_weight
 
